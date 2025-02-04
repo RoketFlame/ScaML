@@ -16,7 +16,7 @@ type constant =
 type ty =
   | Ty_var of Ident.t  (** A type variable such as ['a] *)
   | Ty_arr of ty * ty  (** [T1 -> T2] *)
-  | Ty_tuple of ty * ty * ty list  (** [T1 * ... * Tn]. Invariant: [n >= 2] *)
+  | Ty_tuple of ty list2  (** [T1 * ... * Tn]. Invariant: [n >= 2] *)
   | Ty_con of Ident.t * ty list
       (** [TyCon(tconstr, l)] represents:
           - [tconstr]               when [l=[]]
@@ -32,7 +32,7 @@ type pattern =
   | Pat_constraint of pattern * ty  (** [(P : T)] *)
   | Pat_constant of constant
       (** Patterns such as [1], ['a'], ["hello"], [1.5] *)
-  | Pat_tuple of pattern * pattern * pattern list
+  | Pat_tuple of pattern list2
       (** Patterns [(P1, ..., Pn)]. Invariant: [n >= 2] *)
   | Pat_or of pattern * pattern  (** Pattern [P1 | P2] *)
   | Pat_construct of Ident.t * pattern option
@@ -60,25 +60,25 @@ and expression =
   | Exp_constraint of expression * ty  (** [(E : T)] *)
   | Exp_constant of constant
       (** Expression constant such as [1], ['a'], ["hello"], [1.5] *)
-  | Exp_let of rec_flag * value_binding * value_binding list * expression
+  | Exp_let of rec_flag * value_binding list1 * expression
       (** [Exp_let(flag, [(P1,E1) ; ... ; (Pn,En)], E)] represents:
           - [let P1 = E1 and ... and Pn = EN in E]     when [flag] is [Nonrecursive]
           - [let rec P1 = E1 and ... and Pn = EN in E] when [flag] is [Recursive].
           Invariant: [n >= 1]
         *)
-  | Exp_fun of pattern * pattern list * expression
+  | Exp_fun of pattern list1 * expression
       (** [Exp_fun ([P1; ...; Pn], E)] represents [fun P1 ... Pn -> E].
           Invariant: [n >= 1]
         *)
-  | Exp_function of case * case list
+  | Exp_function of case list1
       (** [Exp_function([C1; ...; Cn])] represents [function C1 | ... | Cn].
           Invariant: [n >= 1]
         *)
   | Exp_apply of expression * expression
       (** [Exp_apply(E0, E1)] represents [E0 E1] *)
-  | Exp_match of expression * case * case list
+  | Exp_match of expression * case list1
       (** [match E0 with P1 -> E1 | ... | Pn -> En]. Invariant: [n >= 1] *)
-  | Exp_tuple of expression * expression * expression list
+  | Exp_tuple of expression list2
       (** Expressions [(E1, ..., En)]. Invariant: [n >= 2] *)
   | Exp_construct of Ident.t * expression option
       (** [Exp_construct(C, exp)] represents:
@@ -105,7 +105,7 @@ type type_decl =
 type structure_item =
   | Str_eval of expression  (** [E] *)
   | Str_type of type_decl  (** [type T = C of string] *)
-  | Str_value of rec_flag * value_binding * value_binding list
+  | Str_value of rec_flag * value_binding list1
       (** [Str_value(flag, [(P1, E1) ; ... ; (Pn, En)])] represents:
           - [let P1 = E1 and ... and Pn = EN]      when [flag] is [Nonrecursive]
           - [let rec P1 = E1 and ... and Pn = EN ] when [flag] is [Recursive].
