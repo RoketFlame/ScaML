@@ -7,9 +7,6 @@ open Smisc
 
 type constant =
   | Const_integer of int  (** Integer such as [25] *)
-  | Const_char of char  (** Character such as ['c'] *)
-  | Const_string of string
-      (** Constant string such as ["constant"] or [{|other constant|}] *)
 [@@deriving eq, show {with_path= false}]
 
 (* ======= Types ======= *)
@@ -34,7 +31,6 @@ type pattern =
       (** Patterns such as [1], ['a'], ["hello"], [1.5] *)
   | Pat_tuple of pattern list2
       (** Patterns [(P1, ..., Pn)]. Invariant: [n >= 2] *)
-  | Pat_or of pattern * pattern  (** Pattern [P1 | P2] *)
   | Pat_construct of Ident.t * pattern option
       (** [Pat_construct(C, args)] represents:
           - [C]   when [args] is [None]
@@ -70,10 +66,6 @@ and expression =
       (** [Exp_fun ([P1; ...; Pn], E)] represents [fun P1 ... Pn -> E].
           Invariant: [n >= 1]
         *)
-  | Exp_function of case list1
-      (** [Exp_function([C1; ...; Cn])] represents [function C1 | ... | Cn].
-          Invariant: [n >= 1]
-        *)
   | Exp_apply of expression * expression
       (** [Exp_apply(E0, E1)] represents [E0 E1] *)
   | Exp_match of expression * case list1
@@ -88,23 +80,12 @@ and expression =
         *)
   | Exp_ifthenelse of expression * expression * expression option
       (** [if E1 then E2 else E3] *)
-  | Exp_sequence of expression * expression  (** [E1; E2] *)
 [@@deriving show {with_path= false}]
 
 (* ======= Module structure ======= *)
 
-(** Constructor declaration. E.g. [A of string] *)
-type constructor_decl = {id: Ident.t; arg: ty option}
-[@@deriving show {with_path= false}]
-
-(** Variant type declaration *)
-type type_decl =
-  {id: Ident.t; params: Ident.t list; variants: constructor_decl list}
-[@@deriving show {with_path= false}]
-
 type structure_item =
   | Str_eval of expression  (** [E] *)
-  | Str_type of type_decl  (** [type T = C of string] *)
   | Str_value of rec_flag * value_binding list1
       (** [Str_value(flag, [(P1, E1) ; ... ; (Pn, En)])] represents:
           - [let P1 = E1 and ... and Pn = EN]      when [flag] is [Nonrecursive]
