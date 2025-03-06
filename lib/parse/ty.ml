@@ -5,13 +5,13 @@
 open! Base
 open Angstrom
 open Common
-open Ast
 open Smisc
+open Types
 
 (** ['a] *)
 let parse_var =
   char '\'' *> (parse_lowercase_ident <|> parse_capitalized_ident)
-  >>| fun name -> Ty_var (Ident name)
+  >>| fun name -> Ty.Ty_var (Var.Var name)
 
 (**
   typeconstr
@@ -21,7 +21,7 @@ let parse_constr pty =
   both
     (option [] (char '(' *> sep_by1 (ws *> char ',') pty <* ws <* char ')'))
     (ws *> parse_lowercase_ident)
-  >>| fun (args, name) -> Ty_con (Ident name, args)
+  >>| fun (args, name) -> Ty.Ty_con (Ident name, args)
 
 (**
   typexpr
@@ -60,11 +60,11 @@ let parse_ty =
   let fold_infix acc (op, rhs) =
     match op with
     | OpArrow ->
-        Ty_arr (acc, rhs)
+        Ty.Ty_arr (acc, rhs)
     | OpTuple -> (
       match rhs with
       | Ty_tuple tl ->
-          Ty_tuple (to_list2_exn (acc :: from_list2 tl))
+          Ty.Ty_tuple (to_list2_exn (acc :: from_list2 tl))
       | _ ->
           Ty_tuple (to_list2_exn [acc; rhs]) )
   in

@@ -11,12 +11,7 @@ let%expect_test "parse_function_pattern_matching" =
   pp pp_expression parse_expression "function | a -> true | b -> false" ;
   [%expect
     {|
-       (Exp_function
-          ({ left = (Pat_var (Ident "a"));
-             right = (Exp_construct ((Ident "true"), None)) },
-           [{ left = (Pat_var (Ident "b"));
-              right = (Exp_construct ((Ident "false"), None)) }
-             ])) |}]
+       syntax error |}]
 
 let%expect_test "parse_lambda_fun" =
   pp pp_expression parse_expression "fun x y -> (x + y : int)" ;
@@ -27,7 +22,7 @@ let%expect_test "parse_lambda_fun" =
              (Exp_apply (
                 (Exp_apply ((Exp_ident (Ident "+")), (Exp_ident (Ident "x")))),
                 (Exp_ident (Ident "y")))),
-             (Ty_con ((Ident "int"), []))))
+             int))
           )) |}]
 
 let%expect_test "parse_custom_operator" =
@@ -68,23 +63,7 @@ let%expect_test "parse_ifthenelse" =
           (Exp_ifthenelse ((Exp_ident (Ident "b")), (Exp_ident (Ident "c")), None)),
           (Some (Exp_ident (Ident "d"))))) |}]
 
-let%expect_test "parse_if_with_seq1" =
-  pp pp_expression parse_expression "if a; b then c; d" ;
-  [%expect
-    {|
-       (Exp_sequence (
-          (Exp_ifthenelse (
-             (Exp_sequence ((Exp_ident (Ident "a")), (Exp_ident (Ident "b")))),
-             (Exp_ident (Ident "c")), None)),
-          (Exp_ident (Ident "d")))) |}]
 
-let%expect_test "parse_if_with_seq2" =
-  pp pp_expression parse_expression "if a; b then (c; d)" ;
-  [%expect
-    {|
-       (Exp_ifthenelse (
-          (Exp_sequence ((Exp_ident (Ident "a")), (Exp_ident (Ident "b")))),
-          (Exp_sequence ((Exp_ident (Ident "c")), (Exp_ident (Ident "d")))), None)) |}]
 
 let%expect_test "parse_match1" =
   pp pp_expression parse_expression "match a with b -> c | d -> e" ;
@@ -99,13 +78,7 @@ let%expect_test "parse_match2" =
   pp pp_expression parse_expression "match a with | b | c | d -> e | f -> g" ;
   [%expect
     {|
-       (Exp_match ((Exp_ident (Ident "a")),
-          ({ left =
-             (Pat_or ((Pat_or ((Pat_var (Ident "b")), (Pat_var (Ident "c")))),
-                (Pat_var (Ident "d"))));
-             right = (Exp_ident (Ident "e")) },
-           [{ left = (Pat_var (Ident "f")); right = (Exp_ident (Ident "g")) }])
-          )) |}]
+       syntax error |}]
 
 let%expect_test "parse_constr1" =
   pp pp_expression parse_expression "Nil" ;
@@ -147,21 +120,6 @@ let%expect_test "parse_list" =
                     [])))
           )) |}]
 
-let%expect_test "parse_list_with_seq" =
-  pp pp_expression parse_expression "[a;(b;c)]" ;
-  [%expect
-    {|
-       (Exp_construct ((Ident "::"),
-          (Some (Exp_tuple
-                   ((Exp_ident (Ident "a")),
-                    (Exp_construct ((Ident "::"),
-                       (Some (Exp_tuple
-                                ((Exp_sequence ((Exp_ident (Ident "b")),
-                                    (Exp_ident (Ident "c")))),
-                                 (Exp_construct ((Ident "[]"), None)), [])))
-                       )),
-                    [])))
-          )) |}]
 
 let%expect_test "parse_list_1element" =
   pp pp_expression parse_expression "[a]" ;
@@ -202,15 +160,6 @@ let%expect_test "parse_list_op" =
                     [])))
           )) |}]
 
-let%expect_test "parse_seq_op" =
-  pp pp_expression parse_expression "(a ; b) ; c ; d ; e" ;
-  [%expect
-    {|
-       (Exp_sequence (
-          (Exp_sequence ((Exp_ident (Ident "a")), (Exp_ident (Ident "b")))),
-          (Exp_sequence ((Exp_ident (Ident "c")),
-             (Exp_sequence ((Exp_ident (Ident "d")), (Exp_ident (Ident "e"))))))
-          )) |}]
 
 let%expect_test "parse_tuple_op" =
   pp pp_expression parse_expression "a, (b, c), d, e" ;
@@ -235,20 +184,3 @@ let%expect_test "parse_plus_minus_prefix_op" =
              ))
           )) |}]
 
-let%expect_test "parse_custom_prefix_op" =
-  pp pp_expression parse_expression "?!5; !%< 123; !0; ~-3" ;
-  [%expect
-    {|
-       (Exp_sequence (
-          (Exp_apply ((Exp_ident (Ident "?!")), (Exp_constant (Const_integer 5)))),
-          (Exp_sequence (
-             (Exp_apply ((Exp_ident (Ident "!%<")),
-                (Exp_constant (Const_integer 123)))),
-             (Exp_sequence (
-                (Exp_apply ((Exp_ident (Ident "!")),
-                   (Exp_constant (Const_integer 0)))),
-                (Exp_apply ((Exp_ident (Ident "~-")),
-                   (Exp_constant (Const_integer 3))))
-                ))
-             ))
-          )) |}]

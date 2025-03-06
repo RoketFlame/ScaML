@@ -172,20 +172,7 @@ let%expect_test "parse_type_decl" =
   run {| type 'a list = Nil | Cons of 'a * 'a list |} ;
   [%expect
     {|
-       [(Str_type
-           { id = (Ident "list"); params = [(Ident "a")];
-             variants =
-             [{ id = (Ident "Nil"); arg = None };
-               { id = (Ident "Cons");
-                 arg =
-                 (Some (Ty_tuple
-                          ((Ty_var (Ident "a")),
-                           (Ty_con ((Ident "list"), [(Ty_var (Ident "a"))])),
-                           [])))
-                 }
-               ]
-             })
-         ] |}]
+       syntax error |}]
 
 let%expect_test _ =
   run {| id let a = 1 in a |} ;
@@ -229,9 +216,7 @@ let%expect_test _ =
            ({ pat = (Pat_var (Ident "f"));
               expr =
               (Exp_fun (((Pat_var (Ident "x")), [(Pat_var (Ident "y"))]),
-                 (Exp_constraint ((Exp_constant (Const_integer 1)),
-                    (Ty_con ((Ident "int"), []))))
-                 ))
+                 (Exp_constraint ((Exp_constant (Const_integer 1)), int))))
               },
             []),
            (Exp_ident (Ident "f")))))

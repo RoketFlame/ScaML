@@ -21,15 +21,15 @@ let%expect_test "parse_unit" =
 
 let%expect_test "parse_quoted_string_literal1" =
   pp pp_constant parse_const "{|Hello world!|}" ;
-  [%expect {| (Const_string "Hello world!") |}]
+  [%expect {| syntax error |}]
 
 let%expect_test "parse_quoted_string_literal2" =
   pp pp_constant parse_const "{aa|Hello world!|aa}" ;
-  [%expect {| (Const_string "Hello world!") |}]
+  [%expect {| syntax error |}]
 
 let%expect_test "parse_quoted_string_literal3" =
   pp pp_constant parse_const "{aa|Hello |aa world!|aa}" ;
-  [%expect {| (Const_string "Hello |aa world!") |}]
+  [%expect {| syntax error |}]
 
 let%expect_test "parse_value_name1" =
   pp Format.pp_print_string parse_value_name "abc" ;

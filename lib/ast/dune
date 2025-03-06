@@ -1,7 +1,7 @@
 (library
  (name ast)
  (public_name ScaML.Ast)
- (libraries base smisc)
+ (libraries base smisc types)
  (preprocess
   (pps ppx_deriving.show ppx_deriving.eq))
  (instrumentation

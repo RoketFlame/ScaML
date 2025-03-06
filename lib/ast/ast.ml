@@ -10,17 +10,7 @@ type constant =
 [@@deriving eq, show {with_path= false}]
 
 (* ======= Types ======= *)
-type ty =
-  | Ty_var of Ident.t  (** A type variable such as ['a] *)
-  | Ty_arr of ty * ty  (** [T1 -> T2] *)
-  | Ty_tuple of ty list2  (** [T1 * ... * Tn]. Invariant: [n >= 2] *)
-  | Ty_con of Ident.t * ty list
-      (** [TyCon(tconstr, l)] represents:
-          - [tconstr]               when [l=[]]
-          - [T tconstr]             when [l=[T]]
-          - [(T1, ..., Tn) tconstr] when [l=[T1, ..., Tn]]
-        *)
-[@@deriving show {with_path= false}]
+type ty = Types.Ty.t [@@deriving show {with_path= false}]
 
 (* ======= Patterns ======= *)
 type pattern =

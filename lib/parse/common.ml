@@ -152,7 +152,7 @@ let parse_value_name =
   <|> (char '(' *> ws *> parse_custom_operator_name <* ws <* char ')')
 
 let parse_type_var =
-  char '\'' *> parse_lowercase_ident >>= fun s -> return (Ident.Ident s)
+  char '\'' *> parse_lowercase_ident >>= fun s -> return (Types.Var.Var s)
 
 (* ======= Constants ======= *)
 

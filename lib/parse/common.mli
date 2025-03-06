@@ -39,7 +39,7 @@ val parse_value_name : string t
 val parse_constr_name : string t
 (** constr-name ::= capitalized-ident | true | false | () *)
 
-val parse_type_var : Ident.t t
+val parse_type_var : Types.Var.t t
 
 val parse_const : constant t
 

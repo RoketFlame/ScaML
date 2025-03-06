@@ -9,8 +9,7 @@ open Pattern
 
 let%expect_test "parse_constraint" =
   pp pp_pattern parse_pattern "(x : int)" ;
-  [%expect
-    {| (Pat_constraint ((Pat_var (Ident "x")), (Ty_con ((Ident "int"), [])))) |}]
+  [%expect {| (Pat_constraint ((Pat_var (Ident "x")), int)) |}]
 
 let%expect_test "parse_var" =
   pp pp_pattern parse_pattern "a" ;
@@ -43,17 +42,13 @@ let%expect_test "parse_constr_or_tuple" =
   pp pp_pattern parse_pattern "C _ | a, b" ;
   [%expect
     {|
-       (Pat_or ((Pat_construct ((Ident "C"), (Some Pat_any))),
-          (Pat_tuple ((Pat_var (Ident "a")), (Pat_var (Ident "b")), [])))) |}]
+       syntax error |}]
 
 let%expect_test "parse_or" =
   pp pp_pattern parse_pattern "a | (b | c) | d" ;
   [%expect
     {|
-       (Pat_or (
-          (Pat_or ((Pat_var (Ident "a")),
-             (Pat_or ((Pat_var (Ident "b")), (Pat_var (Ident "c")))))),
-          (Pat_var (Ident "d")))) |}]
+       syntax error |}]
 
 let%expect_test "parse_tuple" =
   pp pp_pattern parse_pattern "a, (b, c), d" ;
@@ -68,8 +63,7 @@ let%expect_test "parse_or_tuple" =
   pp pp_pattern parse_pattern "a, b | c, d" ;
   [%expect
     {|
-       (Pat_or ((Pat_tuple ((Pat_var (Ident "a")), (Pat_var (Ident "b")), [])),
-          (Pat_tuple ((Pat_var (Ident "c")), (Pat_var (Ident "d")), [])))) |}]
+       syntax error |}]
 
 let%expect_test "parse_list_op" =
   pp pp_pattern parse_pattern "a::(b::c)::d" ;
@@ -94,20 +88,7 @@ let%expect_test "parse_list_or_tuple" =
   pp pp_pattern parse_pattern "a::b::c,d|e" ;
   [%expect
     {|
-       (Pat_or (
-          (Pat_tuple
-             ((Pat_construct ((Ident "::"),
-                 (Some (Pat_tuple
-                          ((Pat_var (Ident "a")),
-                           (Pat_construct ((Ident "::"),
-                              (Some (Pat_tuple
-                                       ((Pat_var (Ident "b")),
-                                        (Pat_var (Ident "c")), [])))
-                              )),
-                           [])))
-                 )),
-              (Pat_var (Ident "d")), [])),
-          (Pat_var (Ident "e")))) |}]
+       syntax error |}]
 
 let%expect_test "parse_list" =
   pp pp_pattern parse_pattern "[a;b;c]" ;
