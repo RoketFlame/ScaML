@@ -59,14 +59,12 @@ let parse_single_pat ppat =
 
 (* ======= Operators parsing ======= *)
 
-type pat_infix_op = OpOr | OpTuple | OpList
+type pat_infix_op =  OpTuple | OpList
 
 let peek_infix_op =
   let peek_1char_op =
     peek_char_fail
     >>= function
-    | '|' ->
-        return {op= OpOr; op_length= 1}
     | ',' ->
         return {op= OpTuple; op_length= 1}
     | _ ->
@@ -84,8 +82,6 @@ let peek_infix_op =
 
 (** Set precedence and associativity for infix operators *)
 let get_infix_binding_power = function
-  | OpOr ->
-      (1, 2)
   | OpTuple ->
       (5, 4)
   | OpList ->
@@ -94,8 +90,6 @@ let get_infix_binding_power = function
 let parse_pattern =
   let fold_infix acc (op, rhs) =
     match op with
-    | OpOr ->
-        Pat_or (acc, rhs)
     | OpTuple -> (
       match rhs with
       | Pat_tuple tl ->

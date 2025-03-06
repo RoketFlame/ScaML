@@ -87,11 +87,6 @@ let parse_exp_fun pexp =
     (string "fun" *> sep_by1 ws parse_pattern >>| to_list1_exn)
     (ws *> string "->" *> pexp)
 
-(** [function P1 -> E1 | ... | Pn -> En] *)
-let parse_exp_function pexp =
-  string "function" *> ws *> parse_match_cases pexp
-  >>| fun cases -> Exp_function (to_list1_exn cases)
-
 (* ======= Operators parsing ======= *)
 
 type expr_infix_op =
@@ -208,7 +203,6 @@ let parse_single_exp ?(disable_let = false) pexp =
        ; parse_exp_constr
        ; parse_exp_constraint (pexp None)
        ; char '(' *> pexp None <* ws <* char ')'
-       ; parse_exp_function (pexp None)
        ; parse_exp_fun (pexp None)
        ; parse_exp_list (pexp (Some IOpSeq))
          (* disable ; as it's a separator in lists *)
@@ -231,8 +225,6 @@ let parse_expression =
             Exp_apply (acc, rhs) )
       | IOpList ->
           Exp_construct (Ident "::", Some (Exp_tuple (to_list2_exn [acc; rhs])))
-      | IOpSeq ->
-          Exp_sequence (acc, rhs)
       | IOpTuple -> (
         match rhs with
         | Exp_tuple l ->
@@ -241,6 +233,8 @@ let parse_expression =
             Exp_tuple (to_list2_exn [acc; rhs]) )
       | IOpCustom op ->
           Exp_apply (Exp_apply (Exp_ident op, acc), rhs)
+      | _ ->
+          failwith "Sequence operator not implemented"
     in
     let apply_prefix op exp =
       Exp_apply

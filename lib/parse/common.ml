@@ -160,27 +160,7 @@ let parse_int =
   take_while1 (function '0' .. '9' -> true | _ -> false)
   >>| fun i -> Const_integer (Int.of_string i)
 
-let parse_string =
-  let parse_string_literal1 =
-    (* [{id|hello_world|id}] *)
-    let ident = take_while (function 'a' .. 'z' | '_' -> true | _ -> false) in
-    char '{' *> ident
-    >>= fun id ->
-    char '|' *> many_till any_char (string ("|" ^ id ^ "}"))
-    >>| fun s -> Const_string (String.of_char_list s)
-  in
-  let parse_string_literal2 =
-    (* ["hello world"] *)
-    let open Char in
-    char (of_int_exn 34) *> take_till (Char.equal (of_int_exn 34))
-    <* char (of_int_exn 34) (* [of_int_exn 34 = '"'] *)
-    >>| fun s -> Const_string s
-  in
-  parse_string_literal2 <|> parse_string_literal1
-
-let parse_char = char '\'' *> any_char <* char '\'' >>| fun c -> Const_char c
-
-let parse_const = choice [parse_char; parse_string; parse_int]
+let parse_const = choice [parse_int]
 
 (* ======= Value bindings ======= *)
 
