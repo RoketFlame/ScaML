@@ -1,0 +1,6 @@
+(library
+ (name middleend)
+ (public_name ScaML.Middleend)
+ (libraries base ast)
+ (preprocess
+  (pps ppx_deriving.show ppx_deriving.eq)))
