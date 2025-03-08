@@ -1,5 +1,5 @@
 (library
- (name misc)
+ (name smisc)
  (public_name ScaML.Misc)
  (libraries base)
  (preprocess
